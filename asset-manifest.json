@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/solari-cookbook/static/css/main.28004f4f.css",
-    "main.js": "/solari-cookbook/static/js/main.fcca13e4.js",
+    "main.js": "/solari-cookbook/static/js/main.388814f3.js",
     "index.html": "/solari-cookbook/index.html",
     "main.28004f4f.css.map": "/solari-cookbook/static/css/main.28004f4f.css.map",
-    "main.fcca13e4.js.map": "/solari-cookbook/static/js/main.fcca13e4.js.map"
+    "main.388814f3.js.map": "/solari-cookbook/static/js/main.388814f3.js.map"
   },
   "entrypoints": [
     "static/css/main.28004f4f.css",
-    "static/js/main.fcca13e4.js"
+    "static/js/main.388814f3.js"
   ]
 }
