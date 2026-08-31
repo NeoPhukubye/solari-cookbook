@@ -48,7 +48,7 @@ app.post("/sessions", async (req, res) => {
     } else if (type === "browser") {
       session = await browser.launch()
     } else if (type === "sandbox") {
-      session = await sandbox.create({ template: "base", timeoutMs: 5 * 60_000 })
+      session = await sandbox.create({ template: "base", timeoutMs: 2 * 60_000 })
       await session.connect()
     } else {
       return res.status(400).json({ error: "Invalid type: must be desktop|browser|sandbox" })
