@@ -24,9 +24,11 @@ export default function App() {
   const refresh = useCallback(async () => {
     try {
       const list = await api("/sessions")
-      setSessions(list.sessions || [])
+      if (list && Array.isArray(list.sessions)) {
+        setSessions(list.sessions)
+      }
     } catch (e) {
-      // Background poll silently fails if backend is waking up
+      // Keep existing sessions in state if backend poll fails
     }
   }, [api])
 
@@ -43,7 +45,9 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ type }),
       })
-      setSessions((s) => [...s, data])
+      if (data && data.id) {
+        setSessions((s) => [...(Array.isArray(s) ? s : []), data])
+      }
     } catch (e) {
       alert(`Error creating ${type}: ${e.message}`)
     } finally {
@@ -54,7 +58,7 @@ export default function App() {
   const closeSession = async (id) => {
     try {
       await api(`/sessions/${id}/close`, { method: "POST" })
-      setSessions((s) => s.filter((x) => x.id !== id))
+      setSessions((s) => (Array.isArray(s) ? s.filter((x) => x.id !== id) : []))
       setOutputs((o) => {
         const n = { ...o }
         delete n[id]
@@ -116,6 +120,8 @@ export default function App() {
     }
   }
 
+  const currentSessions = Array.isArray(sessions) ? sessions : []
+
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: 24, fontFamily: "sans-serif", color: "#f8fafc" }}>
       <h1 style={{ fontSize: 28, marginBottom: 4 }}>Solari Agent Dashboard</h1>
@@ -157,7 +163,7 @@ export default function App() {
               color: "#fff",
               cursor: busy[type] ? "not-allowed" : "pointer",
               textTransform: "capitalize",
-              fontWeight: 600
+              fontWeight: 600,
             }}
           >
             {busy[type] ? "Starting..." : `New ${type}`}
@@ -166,7 +172,7 @@ export default function App() {
       </div>
 
       <div style={{ display: "grid", gap: 16 }}>
-        {sessions.map((s) => (
+        {currentSessions.map((s) => (
           <div
             key={s.id}
             style={{
@@ -210,7 +216,7 @@ export default function App() {
                     cursor: "pointer",
                   }}
                 >
-                  {busy[`browser-${id}`] ? "Running..." : "Visit URL"}
+                  {busy[`browser-${s.id}`] ? "Running..." : "Visit URL"}
                 </button>
               )}
               {s.type === "desktop" && (
@@ -265,7 +271,7 @@ export default function App() {
         ))}
       </div>
 
-      {sessions.length === 0 && (
+      {currentSessions.length === 0 && (
         <p style={{ color: "#64748b", textAlign: "center", marginTop: 40 }}>
           No active sessions. Create one above.
         </p>
