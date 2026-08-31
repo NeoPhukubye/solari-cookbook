@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/solari-cookbook/static/css/main.28004f4f.css",
+    "main.js": "/solari-cookbook/static/js/main.fcca13e4.js",
+    "index.html": "/solari-cookbook/index.html",
+    "main.28004f4f.css.map": "/solari-cookbook/static/css/main.28004f4f.css.map",
+    "main.fcca13e4.js.map": "/solari-cookbook/static/js/main.fcca13e4.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.28004f4f.css",
+    "static/js/main.fcca13e4.js"
+  ]
+}
