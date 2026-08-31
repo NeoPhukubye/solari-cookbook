@@ -20,5 +20,5 @@
     "production": [">0.2%", "not dead", "not op_mini all"],
     "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   },
-  "homepage": "https://<your-username>.github.io/solari-agent-dashboard"
+  "homepage": "https://neophukubye.github.io/solari-cookbook"
 }
