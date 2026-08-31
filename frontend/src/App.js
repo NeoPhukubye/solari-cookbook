@@ -1,34 +1,38 @@
 import React, { useState, useEffect, useCallback } from "react"
 
-const API = process.env.REACT_APP_API_URL || ""
-
-async function api(path, opts = {}) {
-  const res = await fetch(`${API}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...opts,
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
-}
+const DEFAULT_API = localStorage.getItem("API_URL") || "https://solari-cookbook.onrender.com"
 
 export default function App() {
   const [sessions, setSessions] = useState([])
   const [busy, setBusy] = useState({})
   const [outputs, setOutputs] = useState({})
-  const [backendUrl, setBackendUrl] = useState(API)
+  const [backendUrl, setBackendUrl] = useState(DEFAULT_API)
+
+  const api = useCallback(async (path, opts = {}) => {
+    const base = backendUrl.replace(/\/+$/, '')
+    const res = await fetch(`${base}${path}`, {
+      headers: { "Content-Type": "application/json" },
+      ...opts,
+    })
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}))
+      throw new Error(errData.error || `HTTP ${res.status}`)
+    }
+    return res.json()
+  }, [backendUrl])
 
   const refresh = useCallback(async () => {
     try {
       const list = await api("/sessions")
       setSessions(list.sessions || [])
     } catch (e) {
-      console.error(e)
+      // Background poll silently fails if backend is waking up
     }
-  }, [API])
+  }, [api])
 
   useEffect(() => {
     refresh()
-    const t = setInterval(refresh, 3000)
+    const t = setInterval(refresh, 5000)
     return () => clearInterval(t)
   }, [refresh])
 
@@ -41,7 +45,7 @@ export default function App() {
       })
       setSessions((s) => [...s, data])
     } catch (e) {
-      alert(e.message)
+      alert(`Error creating ${type}: ${e.message}`)
     } finally {
       setBusy((b) => ({ ...b, [type]: false }))
     }
@@ -113,7 +117,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 24 }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 24, fontFamily: "sans-serif", color: "#f8fafc" }}>
       <h1 style={{ fontSize: 28, marginBottom: 4 }}>Solari Agent Dashboard</h1>
       <p style={{ color: "#94a3b8", marginTop: 0, marginBottom: 24 }}>
         Orchestrate desktop, browser, and sandbox sessions from one place.
@@ -127,7 +131,7 @@ export default function App() {
             setBackendUrl(e.target.value)
             localStorage.setItem("API_URL", e.target.value)
           }}
-          placeholder="https://your-app.onrender.com"
+          placeholder="https://solari-cookbook.onrender.com"
           style={{
             flex: 1,
             padding: "8px 12px",
@@ -153,6 +157,7 @@ export default function App() {
               color: "#fff",
               cursor: busy[type] ? "not-allowed" : "pointer",
               textTransform: "capitalize",
+              fontWeight: 600
             }}
           >
             {busy[type] ? "Starting..." : `New ${type}`}
@@ -205,7 +210,7 @@ export default function App() {
                     cursor: "pointer",
                   }}
                 >
-                  {busy[`browser-${s.id}`] ? "Running..." : "Visit URL"}
+                  {busy[`browser-${id}`] ? "Running..." : "Visit URL"}
                 </button>
               )}
               {s.type === "desktop" && (
