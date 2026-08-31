@@ -30,6 +30,17 @@ async function withSession(id, fn) {
 
 app.get("/health", (_req, res) => res.json({ ok: true }))
 
+app.get("/", (_req, res) => res.json({ status: "ok", service: "Solari Agent Backend" }))
+
+app.get("/sessions", (_req, res) => {
+  const list = Array.from(sessions.entries()).map(([id, meta]) => ({
+    id,
+    type: meta.type,
+    created: meta.created,
+  }))
+  res.json({ sessions: list })
+})
+
 app.post("/sessions", async (req, res) => {
   const { type } = req.body
   let session
